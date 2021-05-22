@@ -18,6 +18,7 @@ engine = create_engine(f"sqlite:///{sqlLite}")
 
 # reflect an existing database into a new model
 Base = automap_base()
+
 # reflect the tables
 Base.prepare(engine, reflect=True)
 
@@ -34,7 +35,6 @@ app = Flask(__name__)
 #################################################
 # Flask Routes
 #################################################
-
 @app.route("/")
 def welcome():
     """List all available api routes."""
@@ -43,8 +43,8 @@ def welcome():
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/<start>"
-        f"/api/v1.0/<start>/<end>"
+        f"/api/v1.0/StartDate<br/>"
+        f"/api/v1.0/StartDate/EndDate"
     )
 
 #########################################
@@ -53,9 +53,21 @@ def precipitation():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    """Return a list of measurement data"""
+    # ADDING DATE FITERING AS THE RUBIC SAYS IT'S NEEDED.  THIS WAS NOT CLEAR IN THE INSTRUCTIONS
+    # Get max date
+    row = session.query(func.max(measurement.date)).all()
+
+    # Set variables to pass into the main query
+    maxDate = row[0][0]
+
+    beginDate = dt.datetime.strptime(str(maxDate), "%Y-%m-%d") - dt.timedelta(days=365)
+    beginDate.strftime("%Y-%m-%d")
+        
     # Query all measurement
-    results = session.query(measurement.date, measurement.prcp).all()
+    results = session.query(measurement.date, measurement.prcp) \
+                        .filter(measurement.date >= beginDate) \
+                        .order_by(measurement.date) \
+                        .all()
 
     # Close session
     session.close()
