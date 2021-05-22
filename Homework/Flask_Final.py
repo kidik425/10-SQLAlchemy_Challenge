@@ -81,8 +81,12 @@ def stations():
     # Close session
     session.close()
 
-    # Convert list of tuples into normal list
-    all_names = list(np.ravel(results))
+    #Append list of names together
+    all_names = []
+    for name in results:
+        name_dict = {}
+        name_dict["station"] = name
+        all_names.append(name_dict)
 
     return jsonify(all_names)
 
@@ -110,7 +114,7 @@ def tobs():
     results = session.query(measurement.date \
                             ,measurement.tobs) \
                     .filter_by(station = activeStation) \
-                    .filter_by(measurement.date >= beginDate) \
+                    .filter(measurement.date >= beginDate) \
                     .all()
 
     # Capture and append results into list of dicts
@@ -136,7 +140,7 @@ def getsTempStart(start):
     results = session.query(func.min(measurement.tobs).label("tmin") \
                             ,func.max(measurement.tobs).label("tmax")  \
                             ,func.round(func.avg(measurement.tobs),1).label("tavg") ) \
-                    .filter_by(measurement.date >= start) \
+                    .filter(measurement.date >= start) \
                     .all()
 
         # Capture and append results into list of dicts
@@ -154,7 +158,7 @@ def getsTempStart(start):
     return jsonify(all_temps)
 
 #########################################
-@app.route("/api/v1.0/precipitation")
+@app.route("/api/v1.0/<start>/<end>")
 def getsTempRange(start=None, end=None):
     # Create our session (link) from Python to the DB
     session = Session(engine)
