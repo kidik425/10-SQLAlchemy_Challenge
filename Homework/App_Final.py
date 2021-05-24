@@ -44,8 +44,8 @@ def welcome():
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/startDate       (format: 'yyyy-mm-dd')<br/>"
-        f"/api/v1.0/startDate/endDate       (formats: 'yyyy-mm-dd')"
+        f"/api/v1.0/&lt;start&gt;       (format: 'yyyy-mm-dd')<br/>"
+        f"/api/v1.0/&lt;start&gt;/&lt;end&gt;       (formats: 'yyyy-mm-dd')"
     )
     return (output)
 
